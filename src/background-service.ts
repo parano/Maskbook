@@ -63,7 +63,7 @@ if (GetContext() === 'background') {
         }
     })
 
-    browser.runtime.onInstalled.addListener(detail => {
+    browser.runtime.onInstalled.addListener(async detail => {
         if (webpackEnv.target === 'WKWebview') return
         if (detail.reason === 'install') {
             browser.tabs.create({ url: getWelcomePageURL() })

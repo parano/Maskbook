@@ -80,10 +80,6 @@ if (GetContext() === 'background') {
     }
 
     MessageCenter.on('closeActiveTab', async () => {
-        if (webpackEnv.target === 'WKWebview') {
-            wrappedTasks('https://m.facebook.com/')
-            return
-        }
         const tabs = await browser.tabs.query({
             active: true,
         })

@@ -35,7 +35,7 @@ async function runCommand(type: string, base = false) {
         await exec("cp", ["Maskbook.base.zip", "Maskbook.chromium.zip"], { cwd })
     }
     console.log(`Building for target: ${type}`)
-    await exec("yarn", [`build:${type.toLowerCase()}`], { cwd })
-    await exec("zip", ["-r", `../Maskbook.${type}.zip`, "*"], { cwd: BUILD_PATH })
-    await exec("rm", ["-rf", BUILD_PATH])
+    await exec('yarn', [`build:${type.toLowerCase()}`], { cwd })
+    await exec('zip', ['-r', `../Maskbook.${type}.zip`, '.'], { cwd: BUILD_PATH })
+    await exec('rm', ['-rf', BUILD_PATH])
 }

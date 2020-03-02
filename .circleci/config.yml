@@ -93,7 +93,7 @@ jobs:
                   name: Build Maskbook
                   command: |
                     export PATH="$(yarn bin):$PATH"
-                    yarn env-cmd -e scripts ts-node ./scripts/ci-build.ts
+                    ts-node --project=scripts/tsconfig.json scripts/ci-build.ts
             - store_artifacts:
                   path: Maskbook.base.zip
                   destination: /Maskbook.base.zip

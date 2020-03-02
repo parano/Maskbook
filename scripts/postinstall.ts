@@ -4,14 +4,14 @@ import path from "path"
 
 const exec = promisify(execFile)
 
-process.chdir(path.join(__dirname, '../'))
+const cwd = path.join(__dirname, '..')
+const hfkit = path.join(cwd, 'node_modules', '@holoflows', 'kit')
 
 async function main() {
     if (process.argv.includes('--upgrade')) {
-        await exec('yarn', ['upgrade', '@holoflows/kit'])
+        await exec('yarn', ['upgrade', '@holoflows/kit'], { cwd })
     }
-    process.chdir('node_modules/@holoflows/kit')
-    await exec('yarn', ['install'])
+    await exec('yarn', ['install'], { cwd: hfkit })
     try {
         /**
          * For unknown reason, first time build will raise an exception. But if we build it twice, problem will be fixed
@@ -24,12 +24,12 @@ async function main() {
          * 119 export function AutomatedTabTask<T extends Record<string, (...args: any[]) => PromiseLike<any>>>(
          *                     ~~~~~~~~~~~~~~~~
          */
-        await exec('yarn', ['build:tsc'])
-        await exec('yarn', ['build:rollup'])
+        await exec('yarn', ['build:tsc'], { cwd: hfkit })
+        await exec('yarn', ['build:rollup'], { cwd: hfkit })
     } catch (e) {
-        console.log('Build failed, retry one more time.')
-        await exec('yarn', ['build:tsc'])
-        await exec('yarn', ['build:rollup'])
+        console.log('Build failed, retry one more time.', { cwd: hfkit })
+        await exec('yarn', ['build:tsc'], { cwd: hfkit })
+        await exec('yarn', ['build:rollup'], { cwd: hfkit })
     }
 }
 

@@ -1,12 +1,17 @@
-const { spawn } = require('./spawn')
-const path = require('path')
+import { execFile } from "child_process"
+import { promisify } from "util"
+import path from "path"
 
-const base = path.join(__dirname, '../')
-process.chdir(base)
-;(async () => {
-    if (process.argv.indexOf('--upgrade') !== -1) await spawn('yarn', ['upgrade', '@holoflows/kit'])
+const exec = promisify(execFile)
+
+process.chdir(path.join(__dirname, '../'))
+
+async function main() {
+    if (process.argv.includes('--upgrade')) {
+        await exec('yarn', ['upgrade', '@holoflows/kit'])
+    }
     process.chdir('node_modules/@holoflows/kit')
-    await spawn('yarn', ['install'])
+    await exec('yarn', ['install'])
     try {
         /**
          * For unknown reason, first time build will raise an exception. But if we build it twice, problem will be fixed
@@ -19,11 +24,13 @@ process.chdir(base)
          * 119 export function AutomatedTabTask<T extends Record<string, (...args: any[]) => PromiseLike<any>>>(
          *                     ~~~~~~~~~~~~~~~~
          */
-        await spawn('yarn', ['build:tsc'])
-        await spawn('yarn', ['build:rollup'])
+        await exec('yarn', ['build:tsc'])
+        await exec('yarn', ['build:rollup'])
     } catch (e) {
         console.log('Build failed, retry one more time.')
-        await spawn('yarn', ['build:tsc'])
-        await spawn('yarn', ['build:rollup'])
+        await exec('yarn', ['build:tsc'])
+        await exec('yarn', ['build:rollup'])
     }
-})()
+}
+
+main()

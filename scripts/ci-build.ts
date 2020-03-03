@@ -18,13 +18,14 @@ async function main() {
 
 main()
 
-function buildTypes(branchName: string): string[] {
-    if (branchName.match(/full/) || branchName === 'master')
+function buildTypes(name: string): string[] {
+    if (/full/.test(name) || name === 'master') {
         return ['base', 'chromium', 'firefox', 'gecko', 'iOS']
-    if (branchName.match(/ios/))
+    } else if (/ios/.test(name)) {
         return ['iOS']
-    if (branchName.match(/android|gecko/))
+    } else if (/android|gecko/.test(name)) {
         return ['firefox', 'gecko']
+    }
     return ['base', 'chromium', 'firefox']
 }
 

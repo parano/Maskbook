@@ -4,7 +4,7 @@ import path from "path"
 
 const exec = promisify(execFile)
 
-const cwd = path.join(__dirname, '..')
+const cwd = process.env.INIT_CWD ?? path.join(__dirname, '..')
 const hfkit = path.join(cwd, 'node_modules', '@holoflows', 'kit')
 
 async function main() {
@@ -12,7 +12,11 @@ async function main() {
         await exec('yarn', ['upgrade', '@holoflows/kit'], { cwd })
     }
     await exec('yarn', ['install'], { cwd: hfkit })
-    try {
+    const build = async () => {
+        await exec('yarn', ['build:tsc'], { cwd: hfkit })
+        await exec('yarn', ['build:rollup'], { cwd: hfkit })
+    }
+    return build().catch(() => {
         /**
          * For unknown reason, first time build will raise an exception. But if we build it twice, problem will be fixed
          *
@@ -24,13 +28,9 @@ async function main() {
          * 119 export function AutomatedTabTask<T extends Record<string, (...args: any[]) => PromiseLike<any>>>(
          *                     ~~~~~~~~~~~~~~~~
          */
-        await exec('yarn', ['build:tsc'], { cwd: hfkit })
-        await exec('yarn', ['build:rollup'], { cwd: hfkit })
-    } catch (e) {
-        console.log('Build failed, retry one more time.', { cwd: hfkit })
-        await exec('yarn', ['build:tsc'], { cwd: hfkit })
-        await exec('yarn', ['build:rollup'], { cwd: hfkit })
-    }
+        console.log('Build failed, retry one more time.')
+        return build()
+    })
 }
 
 main()

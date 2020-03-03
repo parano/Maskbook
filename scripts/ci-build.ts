@@ -12,7 +12,15 @@ async function main() {
     const types = buildTypes(branch)
     console.log(`Branch: ${branch}`)
     for (const type of types) {
-        await runCommand(type, types.includes('base'))
+        if (type === 'chromium' && types.includes('base')) {
+            // chromium doesn't have it's own changes yet.
+            // just copying base version is acceptable
+            await exec("cp", ["Maskbook.base.zip", "Maskbook.chromium.zip"], { cwd })
+        }
+        console.log(`Building for target: ${type}`)
+        await exec('yarn', [`build:${type.toLowerCase()}`], { cwd })
+        await exec('zip', ['-r', `../Maskbook.${type}.zip`, '.'], { cwd: BUILD_PATH })
+        await exec('rm', ['-rf', BUILD_PATH])
     }
 }
 
@@ -25,18 +33,7 @@ function buildTypes(name: string): string[] {
         return ['iOS']
     } else if (/android|gecko/.test(name)) {
         return ['firefox', 'gecko']
+    } else {
+        return ['base', 'chromium', 'firefox']
     }
-    return ['base', 'chromium', 'firefox']
-}
-
-async function runCommand(type: string, base = false) {
-    if (type === 'chromium' && base) {
-        // chromium doesn't have it's own changes yet.
-        // just copying base version is acceptable
-        await exec("cp", ["Maskbook.base.zip", "Maskbook.chromium.zip"], { cwd })
-    }
-    console.log(`Building for target: ${type}`)
-    await exec('yarn', [`build:${type.toLowerCase()}`], { cwd })
-    await exec('zip', ['-r', `../Maskbook.${type}.zip`, '.'], { cwd: BUILD_PATH })
-    await exec('rm', ['-rf', BUILD_PATH])
 }

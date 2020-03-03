@@ -1,14 +1,10 @@
-import { execFile } from "child_process"
-import { promisify } from "util"
+import { execFileSync } from "child_process"
 import path from "path"
 
-const exec = promisify(execFile)
+const stdio = [process.stdin, process.stdout, process.stderr]
 const cwd = path.join(__dirname, '..', 'node_modules', '@holoflows', 'kit')
+const yarn = (...args: string[]) => execFileSync("yarn", args, { cwd, stdio })
 
-async function main() {
-    await exec('yarn', ['install'], { cwd })
-    await exec('yarn', ['build:tsc'], { cwd })
-    await exec('yarn', ['build:rollup'], { cwd })
-}
-
-main()
+yarn('install')
+yarn('build:tsc')
+yarn('build:rollup')

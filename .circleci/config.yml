@@ -91,7 +91,7 @@ jobs:
                   command: sudo apt-get install zip
             - run:
                   name: Build Maskbook
-                  command: PATH="$(yarn bin):$PATH" ts-node scripts/ci-build.ts
+                  command: yarn build-ci
             - store_artifacts:
                   path: Maskbook.base.zip
                   destination: /Maskbook.base.zip
